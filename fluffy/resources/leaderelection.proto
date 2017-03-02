@@ -1,0 +1,40 @@
+option optimize_for = SPEED;
+option java_package = "pipe.leaderelection";
+
+//find out about the status of current leader/election
+
+message StatusOfLeader {
+
+    required AskLeader action = 1;
+    optional LeaderState leaderState = 2;
+    optional int32 leaderId = 4;
+
+    enum LeaderState {
+
+        LEADER_NOTKNOWN = 1;
+        LEADER_ALIVE = 2;
+        LEADER_DEAD = 3;
+    }
+
+    enum AskLeader {
+
+        GIVEMETHELEADER = 1;
+        LEADERIS = 2;
+    }
+
+}
+
+message Vote {
+    required int32 currentTerm = 1;
+    required int32 voterID = 2;
+    optional int32 candidateID = 3;
+}
+
+message RequestVote {
+    required int32 currentTerm = 1;
+    required int32 candidateID = 2;
+    optional int32 voterID = 3;
+}
+
+
+

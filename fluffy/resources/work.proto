@@ -1,0 +1,68 @@
+option optimize_for = SPEED;
+option java_package = "pipe.work";
+
+import "common.proto";
+import "leaderelection.proto";
+
+
+message WorkState {
+    optional int32 enqueued = 1;
+    optional int32 processed = 2;
+}
+
+message Heartbeat {
+    optional WorkState state = 1;
+    optional int32 currentTerm = 2;
+}
+
+/** Work Steal Messages and
+ *  Enums
+ */
+
+message WorkStealing {
+    enum StealType {
+        STEAL_REQUEST = 1;
+        STEAL_RESPONSE = 2;
+
+    }
+    required StealType stealtype = 1;
+}
+
+
+
+// These are messages to keep the network running (not to perform work)
+message WorkMessage {
+    optional Header header = 1;
+    optional int64 secret = 2;
+    optional bool isProcessed = 13;
+    optional string requestId = 14;
+    optional WorkStealing steal = 18;
+    optional bool fileNotFoundInNode=25;
+    optional StateOfLeader stateOfLeader = 16;
+
+    enum StateOfLeader {
+        LEADERALIVE = 1;
+        LEADERDEAD = 2;
+        LEADERNOTKNOWN = 3;
+        LEADERKNOWN = 4;
+    }
+
+    optional string clientMessage = 3;
+
+    oneof payload {
+        Failure err = 4;
+        // a sanity check for testing
+        bool ping = 5;
+        // status updates between adjacent workers
+        Heartbeat beat = 6;
+        Duty duty = 7;
+        WorkState state = 8;
+        StatusOfLeader leader = 9;
+        RequestVote requestVote = 22;
+        Vote vote = 23;
+
+
+    }
+
+    optional bool isStolen = 20;
+}
